@@ -1,0 +1,96 @@
+#include <Servo.h>
+
+// Definição dos pinos do joystick
+#define VRX_PIN A0
+#define VRY_PIN A1
+#define SW_PIN 2
+
+// Definição dos pinos dos motores e do servo
+#define ENA 5
+#define IN1 6
+#define IN2 7
+#define IN3 8
+#define IN4 9
+#define ENB 10
+#define SERVO_PIN 3
+
+Servo myservo;
+
+void setup() {
+  // Inicializa os pinos do joystick
+  pinMode(VRX_PIN, INPUT);
+  pinMode(VRY_PIN, INPUT);
+  pinMode(SW_PIN, INPUT_PULLUP);
+
+  // Inicializa os pinos dos motores
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  // Inicializa o servo
+  myservo.attach(SERVO_PIN);
+  myservo.write(0); // Capô inicialmente fechado
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  int vrxValue = analogRead(VRX_PIN);
+  int vryValue = analogRead(VRY_PIN);
+  int swState = digitalRead(SW_PIN);
+
+  // Controle do servo motor
+  if (swState == LOW) {
+    myservo.write(90); // Levanta o capô
+  } else {
+    myservo.write(0); // Fecha o capô
+  }
+
+  // Controle dos motores
+  if (vrxValue < 400) {
+    // Move para a esquerda
+    analogWrite(ENA, 255);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(ENB, 255);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+  } else if (vrxValue > 600) {
+    // Move para a direita
+    analogWrite(ENA, 255);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENB, 255);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+  } else if (vryValue < 400) {
+    // Move para frente
+    analogWrite(ENA, 255);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENB, 255);
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+  } else if (vryValue > 600) {
+    // Move para trás
+    analogWrite(ENA, 255);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(ENB, 255);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+  } else {
+    // Para
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
+    analogWrite(ENA, 0);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
+    analogWrite(ENB, 0);
+  }
+  delay(10); // Pequeno atraso para estabilidade
+}
+//fim 
